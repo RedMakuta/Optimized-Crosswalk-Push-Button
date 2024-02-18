@@ -10,18 +10,21 @@ void setup() {
     Serial.println("Could not find DRV2605");
     while (1) delay(10);
   }
- 
+
+  Serial.println("Selecting library");
   drv.selectLibrary(1);
   
+  Serial.println("Setting mode");
   // I2C trigger by sending 'go' command 
   // default, internal trigger when sending GO command
   drv.setMode(DRV2605_MODE_INTTRIG); 
+  Serial.println("end setup");
 }
 
 uint8_t effect = 1;
 
 void loop() {
-//  Serial.print("Effect #"); Serial.println(effect);
+  Serial.print("Effect #"); Serial.println(effect);
 
    if (effect == 1) {
     Serial.println("11.2 Waveform Library Effects List");
