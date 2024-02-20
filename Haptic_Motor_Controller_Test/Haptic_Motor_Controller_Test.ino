@@ -408,8 +408,8 @@ void loop() {
   drv.go();
 
   // wait a bit
-  delay(500);
+  delay(1000);
 
   effect++;
-  if (effect > 117) effect = 1;
+  if (effect > 122) effect = 1;
 }
