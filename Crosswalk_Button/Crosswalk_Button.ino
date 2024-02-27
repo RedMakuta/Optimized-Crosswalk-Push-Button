@@ -8,10 +8,10 @@
 #define NUMPIXELS 8 // number of neopixels in strip
 
 // NeoPixel brightness, 0 (min) to 255 (max)
-#define BRIGHTNESS 25 // Set BRIGHTNESS to about 1/5 (max = 255)
+#define BRIGHTNESS 25
 
 Adafruit_NeoPixel pixelsT = Adafruit_NeoPixel(NUMPIXELS, PINTOP, NEO_GRBW + NEO_KHZ800);
-//Adafruit_NeoPixel pixelsB = Adafruit_NeoPixel(NUMPIXELS, PINBOTTOM, NEO_RGBW + NEO_KHZ800);
+Adafruit_NeoPixel pixelsB = Adafruit_NeoPixel(NUMPIXELS, PINBOTTOM, NEO_GRBW + NEO_KHZ800);
 
 uint32_t red = pixelsT.Color(255, 0, 0);
 uint32_t green = pixelsT.Color(0, 255, 0);
@@ -35,12 +35,13 @@ int fsrValue;
 void setup() {
   // Initialize the NeoPixel library.
   pixelsT.begin();
-  //pixelsB.begin();
+  pixelsB.begin();
   pixelsT.setBrightness(BRIGHTNESS);
-  //pixelsB.setBrightness(BRIGHTNESS);
+  pixelsB.setBrightness(BRIGHTNESS);
   pixelsT.clear();
-  //pixelsB.clear();
+  pixelsB.clear();
   pixelsT.show();
+  pixelsB.show();
 
   // Setup the haptic motors
   pinMode(HAPTIC1, OUTPUT);
@@ -76,7 +77,9 @@ void loop() {
     analogWrite(PINGREEN, 0);
     analogWrite(PINRED, 255);
     pixelsT.fill(red);
+    pixelsB.fill(red);
     pixelsT.show();
+    pixelsB.show();
     //lightGreen(0);
     //lightRed(255);
   }
@@ -90,7 +93,9 @@ void buttonPushed() {
     int brightness = int(pow((sin(phase) + 1.0) * 0.5, GAMMA) * 255 + 0.5);
     uint32_t currentYellow = pixelsT.Color(brightness, brightness, 0);
     pixelsT.fill(currentYellow);
+    pixelsB.fill(currentYellow);
     pixelsT.show();
+    pixelsB.show();
     delay(1);
   }
 }
@@ -102,28 +107,49 @@ void buttonPushed() {
 void active() {
   analogWrite(PINGREEN, 255);
   analogWrite(PINRED, 0);
-  for(int timestep = 0; timestep < 60; timestep++) {
+  for(int timestep = 0; timestep < 30; timestep++) {
     int activePixel = timestep % 10;
     pixelsT.clear();
     pixelsT.setPixelColor(activePixel, green);
     pixelsT.show();
-    if(timestep > 0 && timestep <= 20) {
+    pixelsB.clear();
+    pixelsB.setPixelColor(activePixel, green);
+    pixelsB.show();
+    if(timestep > 0 && timestep <= 5) {
       vibrate(HAPTIC1, true);
       vibrate(HAPTIC2, false);
       vibrate(HAPTIC3, false);
     }
-    if(timestep > 20 && timestep <= 40) {
+    if(timestep > 5 && timestep <= 10) {
       vibrate(HAPTIC1, false);
       vibrate(HAPTIC2, true);
       vibrate(HAPTIC3, false);
     }
-    if(timestep > 40 && timestep <= 60) {
+    if(timestep > 10 && timestep <= 15) {
+      vibrate(HAPTIC1, false);
+      vibrate(HAPTIC2, false);
+      vibrate(HAPTIC3, true);
+    }
+    if(timestep > 15 && timestep <= 20) {
+      vibrate(HAPTIC1, true);
+      vibrate(HAPTIC2, false);
+      vibrate(HAPTIC3, false);
+    }
+    if(timestep > 20 && timestep <= 25) {
+      vibrate(HAPTIC1, false);
+      vibrate(HAPTIC2, true);
+      vibrate(HAPTIC3, false);
+    }
+    if(timestep >25 && timestep <= 30) {
       vibrate(HAPTIC1, false);
       vibrate(HAPTIC2, false);
       vibrate(HAPTIC3, true);
     }
     delay(100);
   }
+  vibrate(HAPTIC1, false);
+  vibrate(HAPTIC2, false);
+  vibrate(HAPTIC3, false);
 }
 
 void vibrate(int pin, bool value) {
@@ -147,22 +173,17 @@ void vibratePattern() {
   delay(500);
 }
 
-void lightWholeStrip(Adafruit_NeoPixel strip, uint32_t color) {
+void neopixelLightWholeStrip(Adafruit_NeoPixel strip, uint32_t color) {
   strip.fill(color);
   strip.show();
 }
 
-void lightOne(Adafruit_NeoPixel strip, int index, uint32_t color) {
+void neopixelLghtOne(Adafruit_NeoPixel strip, int index, uint32_t color) {
   strip.setPixelColor(index, color);
   strip.show();
 }
-
-void lightRed(int brightness) {
-  brightness = min(0, max(brightness, 255));
-  analogWrite(PINRED, brightness);
-}
-
-void lightGreen(int brightness) {
-  brightness = min(0, max(brightness, 255));
-  analogWrite(PINGREEN, brightness);
+void neopixelLightOnlyOne(Adafruit_NeoPixel strip, int index, uint32_t color) {
+  strip.clear();
+  strip.setPixelColor(index, color);
+  strip.show();
 }
