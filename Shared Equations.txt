@@ -1,10 +1,10 @@
-﻿"Arrow Height"= 1in
+﻿"Arrow Height"= 1.5in
 "Button Height"= 2in
 "Button Width"= 4in
 "Haptic Diameter"= 10mm
 "Haptic Thickness"= 2.7mm
 "Arrow Spacing"= 1in
-"Arrow Width" = 0.75in
+"Arrow Width" = 1in
 "Haptic Wire Angle" = 63.43
 "Haptic Wire Width" = .1in
 "Haptic Wire Height"= .15in
