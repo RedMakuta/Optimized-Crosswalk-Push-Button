@@ -47,7 +47,7 @@ class HapticMotor {
 #define BRIGHTNESS 50 // NeoPixel brightness, 0 (min) to 255 (max)
 #define GAMMA 2.6
 
-enum  pattern { NONE, FADE, DIRECTIONAL, COLORFILL };
+enum  pattern { NONE, FADE, DIRECTIONAL1, DIRECTIONAL2, COLORFILL, COUNTDOWN};
 
 enum  direction { FORWARD, REVERSE };
 
@@ -81,9 +81,14 @@ class NeoPixel : public Adafruit_NeoPixel {
                 case FADE:
                     FadeUpdate();
                     break;
-                case DIRECTIONAL:
-                    DirectionalUpdate();
+                case DIRECTIONAL1:
+                    Directional1Update();
                     break;
+                case DIRECTIONAL2:
+                    Directional2Update();
+                    break;
+                case COUNTDOWN:
+                    CountdownUpdate();
                 default:
                     break;
             }
@@ -119,10 +124,32 @@ class NeoPixel : public Adafruit_NeoPixel {
       
     }
 
+    void Directional1(uint32_t color, uint8_t interval, direction dir = FORWARD) {
+      ActivePattern = DIRECTIONAL1;
+        Interval = interval;
+        TotalSteps = numPixels();
+        ActiveColor = color;
+        Direction = dir;
+        Index = 0;
+        clear();
+    }
+
+    void Directional1Update() {
+      if(Direction == FORWARD) {
+        clear();
+        setPixelColor(Index, ActiveColor);
+      } else if(Direction == REVERSE) {
+        clear();
+        setPixelColor(numPixels() - Index - 1, ActiveColor);
+      }
+      show();
+      Increment();
+    }
+
     // Initialize for directional
     // Two lights moving from left to right or right to left
-    void Directional(uint32_t color, uint8_t interval, direction dir = FORWARD) {
-        ActivePattern = DIRECTIONAL;
+    void Directional2(uint32_t color, uint8_t interval, direction dir = FORWARD) {
+        ActivePattern = DIRECTIONAL2;
         Interval = interval;
         TotalSteps = numPixels() + 1;
         ActiveColor = color;
@@ -131,7 +158,7 @@ class NeoPixel : public Adafruit_NeoPixel {
         clear();
     }
 
-    void DirectionalUpdate() {
+    void Directional2Update() {
         if(Direction == FORWARD) {
           setPixelColor(Index, ActiveColor);
           setPixelColor(Index - 2, 0, 0, 0, 0); // turn off the one that's two before it
@@ -164,6 +191,27 @@ class NeoPixel : public Adafruit_NeoPixel {
       fill(currentYellow);
       show();
     }
+
+    void Countdown(uint32_t color, uint8_t interval, direction dir = FORWARD) {
+      ActivePattern = COUNTDOWN;
+      Interval = interval;
+      TotalSteps = numPixels();
+      ActiveColor = color;
+      Direction = dir;
+      Index = 0;
+      lastUpdate = millis();
+      fill(color);
+    }
+
+    void CountdownUpdate() {
+        if(Direction == FORWARD){ // turn off the numPixels-Index -1  light
+          setPixelColor(numPixels() - Index -1, 0, 0, 0, 0);
+        } else if(Direction == REVERSE) {
+          setPixelColor(Index, 0, 0, 0, 0);
+        }
+      show();
+      Increment();
+    }
 };
 
 #define ACTIVETIME 15000 // Time that the crosswalk is 'green' for
@@ -175,6 +223,7 @@ NeoPixel bottom(NUMPIXELS, 3, NEO_GRBW + NEO_KHZ800);
 uint32_t red = top.Color(255, 0, 0);
 uint32_t green = top.Color(0, 255, 0);
 uint32_t yellow = top.Color(255, 255, 0);
+uint32_t black = top.Color(0, 0, 0);
 
 // Force sensor
 #define PINFSR 0
@@ -199,8 +248,8 @@ void setup() {
   // Initialize the NeoPixel library.
   top.begin();
   bottom.begin();
-  top.setBrightness(BRIGHTNESS);
-  bottom.setBrightness(BRIGHTNESS);
+  top.setBrightness(75);
+  bottom.setBrightness(75);
   top.clear();
   bottom.clear();
   top.show();
@@ -253,8 +302,8 @@ void loop() {
       if (timeDiff > WAITINGTIME) { // safe to cross
         currentMode = ACTIVE;
         modeStartMillis = currentMillis;
-        top.Directional(green, 100);
-        bottom.Directional(green, 100, REVERSE);
+        top.Directional1(green, 100);
+        bottom.Countdown(green, 2000, REVERSE);
         break;
       }
       // Haptics do nothing
