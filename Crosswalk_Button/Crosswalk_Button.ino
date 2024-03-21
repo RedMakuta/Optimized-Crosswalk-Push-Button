@@ -214,6 +214,29 @@ class NeoPixel : public Adafruit_NeoPixel {
     }
 };
 
+class Buzzer {
+
+  int Pin;
+	long turnOnTime = 150;     // milliseconds of on-time
+	long turnOffTime = 1000;    // milliseconds of off-time
+  int Hz;
+  unsigned long previousBuzz;
+
+  public:
+  Buzzer(int pin int hz) {
+	  Pin = pin;
+	  pinMode(pin, OUTPUT);     
+    Hz = hz;
+  }
+
+  void Update(unsigned long time) {
+    if(time - previousBuzz >= turnOnTime + turnOffTime) {
+      tone(Pin, Hz, turnOnTime);
+      previousBuzz = time;
+    }
+  }
+}
+
 #define ACTIVETIME 15000 // Time that the crosswalk is 'green' for
 #define WAITINGTIME 5000 // time you have to wait after pushing the button for the crosswalk to go 'green'
 
@@ -238,6 +261,9 @@ HapticMotor right(5, 700, 950);
 // Noods
 #define PINRED 10
 #define PINGREEN 11
+
+// Buzzer
+Buzzer speaker(8, 400);
 
 // Loop stuff
 enum mode {OFF, WAITING, ACTIVE};
@@ -277,6 +303,8 @@ void loop() {
  
   //Serial.print("Analog reading = ");
   //Serial.println(fsrValue);
+
+  speaker.Update(currentMillis);
 
   switch(currentMode) {
     case OFF:
