@@ -42,7 +42,7 @@ class HapticMotor {
 };
 
 // Neopixels
-#define NUMPIXELS 8 // number of neopixels in strip
+#define NUMPIXELS 16 // number of neopixels in strip
 
 #define BRIGHTNESS 50 // NeoPixel brightness, 0 (min) to 255 (max)
 #define GAMMA 2.6
