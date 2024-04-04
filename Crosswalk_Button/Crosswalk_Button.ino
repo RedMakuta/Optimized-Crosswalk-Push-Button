@@ -223,7 +223,7 @@ class Buzzer {
   unsigned long previousBuzz;
 
   public:
-  Buzzer(int pin int hz) {
+  Buzzer(int pin, int hz) {
 	  Pin = pin;
 	  pinMode(pin, OUTPUT);     
     Hz = hz;
@@ -235,7 +235,7 @@ class Buzzer {
       previousBuzz = time;
     }
   }
-}
+};
 
 #define ACTIVETIME 15000 // Time that the crosswalk is 'green' for
 #define WAITINGTIME 5000 // time you have to wait after pushing the button for the crosswalk to go 'green'
@@ -309,6 +309,7 @@ void loop() {
   switch(currentMode) {
     case OFF:
       if(fsrValue > FSRACTIVEVALUE) {
+        Serial.println("Button pressed");
         currentMode = WAITING;
         modeStartMillis = millis();
         top.Fade(yellow);
@@ -328,6 +329,7 @@ void loop() {
       break;
     case WAITING:
       if (timeDiff > WAITINGTIME) { // safe to cross
+        Serial.println("Activating");
         currentMode = ACTIVE;
         modeStartMillis = currentMillis;
         top.Directional1(green, 100);
@@ -347,6 +349,7 @@ void loop() {
       break;
     case ACTIVE:
       if(timeDiff > ACTIVETIME) { // active time is up, turn off
+        Serial.println("Turning off");
         currentMode = OFF;
         left.Off();
         middle.Off();
