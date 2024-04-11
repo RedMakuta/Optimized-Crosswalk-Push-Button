@@ -124,7 +124,7 @@ class NeoPixel : public Adafruit_NeoPixel {
       
     }
 
-    void Directional1(uint32_t color, uint8_t interval, direction dir = FORWARD) {
+    void Directional1(uint32_t color, unsigned long interval, direction dir = FORWARD) {
       ActivePattern = DIRECTIONAL1;
         Interval = interval;
         TotalSteps = numPixels();
@@ -148,7 +148,7 @@ class NeoPixel : public Adafruit_NeoPixel {
 
     // Initialize for directional
     // Two lights moving from left to right or right to left
-    void Directional2(uint32_t color, uint8_t interval, direction dir = FORWARD) {
+    void Directional2(uint32_t color, unsigned long interval, direction dir = FORWARD) {
         ActivePattern = DIRECTIONAL2;
         Interval = interval;
         TotalSteps = numPixels() + 1;
@@ -192,7 +192,7 @@ class NeoPixel : public Adafruit_NeoPixel {
       show();
     }
 
-    void Countdown(uint32_t color, uint8_t interval, direction dir = FORWARD) {
+    void Countdown(uint32_t color, unsigned long interval, direction dir = FORWARD) {
       ActivePattern = COUNTDOWN;
       Interval = interval;
       TotalSteps = numPixels();
@@ -200,7 +200,8 @@ class NeoPixel : public Adafruit_NeoPixel {
       Direction = dir;
       Index = 0;
       lastUpdate = millis();
-      fill(color);
+      fill(Color(0,255,0));
+      Serial.println(Interval);
     }
 
     void CountdownUpdate() {
@@ -332,8 +333,8 @@ void loop() {
         Serial.println("Activating");
         currentMode = ACTIVE;
         modeStartMillis = currentMillis;
-        top.Directional1(green, 100);
-        bottom.Countdown(green, 2000, REVERSE);
+        top.Directional2(green, 150);
+        bottom.Countdown(green, 925, REVERSE);
         break;
       }
       // Haptics do nothing
