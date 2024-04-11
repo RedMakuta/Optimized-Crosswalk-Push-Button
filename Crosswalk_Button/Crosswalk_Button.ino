@@ -240,7 +240,7 @@ class Buzzer {
 #define ACTIVETIME 15000 // Time that the crosswalk is 'green' for
 #define WAITINGTIME 5000 // time you have to wait after pushing the button for the crosswalk to go 'green'
 
-NeoPixel top(NUMPIXELS, 2, NEO_GRBW + NEO_KHZ800);
+NeoPixel top(NUMPIXELS, 2, NEO_GRB + NEO_KHZ800);
 NeoPixel bottom(NUMPIXELS, 3, NEO_GRBW + NEO_KHZ800);
 
 uint32_t red = top.Color(255, 0, 0);
