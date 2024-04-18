@@ -42,7 +42,7 @@ class HapticMotor {
 };
 
 // Neopixels
-#define NUMPIXELS 8 // number of neopixels in strip
+#define NUMPIXELS 16 // number of neopixels in strip
 
 #define BRIGHTNESS 50 // NeoPixel brightness, 0 (min) to 255 (max)
 #define GAMMA 2.6
@@ -124,7 +124,7 @@ class NeoPixel : public Adafruit_NeoPixel {
       
     }
 
-    void Directional1(uint32_t color, uint8_t interval, direction dir = FORWARD) {
+    void Directional1(uint32_t color, unsigned long interval, direction dir = FORWARD) {
       ActivePattern = DIRECTIONAL1;
         Interval = interval;
         TotalSteps = numPixels();
@@ -148,7 +148,7 @@ class NeoPixel : public Adafruit_NeoPixel {
 
     // Initialize for directional
     // Two lights moving from left to right or right to left
-    void Directional2(uint32_t color, uint8_t interval, direction dir = FORWARD) {
+    void Directional2(uint32_t color, unsigned long interval, direction dir = FORWARD) {
         ActivePattern = DIRECTIONAL2;
         Interval = interval;
         TotalSteps = numPixels() + 1;
@@ -192,7 +192,7 @@ class NeoPixel : public Adafruit_NeoPixel {
       show();
     }
 
-    void Countdown(uint32_t color, uint8_t interval, direction dir = FORWARD) {
+    void Countdown(uint32_t color, unsigned long interval, direction dir = FORWARD) {
       ActivePattern = COUNTDOWN;
       Interval = interval;
       TotalSteps = numPixels();
@@ -200,7 +200,8 @@ class NeoPixel : public Adafruit_NeoPixel {
       Direction = dir;
       Index = 0;
       lastUpdate = millis();
-      fill(color);
+      fill(Color(0,255,0));
+      Serial.println(Interval);
     }
 
     void CountdownUpdate() {
@@ -223,7 +224,7 @@ class Buzzer {
   unsigned long previousBuzz;
 
   public:
-  Buzzer(int pin int hz) {
+  Buzzer(int pin, int hz) {
 	  Pin = pin;
 	  pinMode(pin, OUTPUT);     
     Hz = hz;
@@ -235,12 +236,12 @@ class Buzzer {
       previousBuzz = time;
     }
   }
-}
+};
 
 #define ACTIVETIME 15000 // Time that the crosswalk is 'green' for
 #define WAITINGTIME 5000 // time you have to wait after pushing the button for the crosswalk to go 'green'
 
-NeoPixel top(NUMPIXELS, 2, NEO_GRBW + NEO_KHZ800);
+NeoPixel top(NUMPIXELS, 2, NEO_GRB + NEO_KHZ800);
 NeoPixel bottom(NUMPIXELS, 3, NEO_GRBW + NEO_KHZ800);
 
 uint32_t red = top.Color(255, 0, 0);
@@ -309,6 +310,7 @@ void loop() {
   switch(currentMode) {
     case OFF:
       if(fsrValue > FSRACTIVEVALUE) {
+        Serial.println("Button pressed");
         currentMode = WAITING;
         modeStartMillis = millis();
         top.Fade(yellow);
@@ -328,10 +330,11 @@ void loop() {
       break;
     case WAITING:
       if (timeDiff > WAITINGTIME) { // safe to cross
+        Serial.println("Activating");
         currentMode = ACTIVE;
         modeStartMillis = currentMillis;
-        top.Directional1(green, 100);
-        bottom.Countdown(green, 2000, REVERSE);
+        top.Directional2(green, 150);
+        bottom.Countdown(green, 925, REVERSE);
         break;
       }
       // Haptics do nothing
@@ -347,6 +350,7 @@ void loop() {
       break;
     case ACTIVE:
       if(timeDiff > ACTIVETIME) { // active time is up, turn off
+        Serial.println("Turning off");
         currentMode = OFF;
         left.Off();
         middle.Off();
